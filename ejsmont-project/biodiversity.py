@@ -13,7 +13,7 @@
 # - `from matplotlib import pyplot as plt`
 # - `import pandas as pd`
 
-# In[1]:
+# In[2]:
 
 
 from matplotlib import pyplot as plt
@@ -29,7 +29,7 @@ import pandas as pd
 # Load the dataset and inspect it:
 # - Load `species_info.csv` into a DataFrame called `species`
 
-# In[7]:
+# In[3]:
 
 
 species = pd.read_csv('species_info.csv')
@@ -37,7 +37,7 @@ species = pd.read_csv('species_info.csv')
 
 # Inspect each DataFrame using `.head()`.
 
-# In[8]:
+# In[4]:
 
 
 print species.head(10)
@@ -48,16 +48,16 @@ print species.head(10)
 
 # How many different species are in the `species` DataFrame?
 
-# In[30]:
+# In[7]:
 
 
-species_count = species['scientific_name'].size
+species_count = species['scientific_name'].unique().size
 print species_count
 
 
 # What are the different values of `category` in `species`?
 
-# In[28]:
+# In[8]:
 
 
 categories = species['category'].unique()
@@ -66,7 +66,7 @@ print categories
 
 # What are the different values of `conservation_status`?
 
-# In[31]:
+# In[9]:
 
 
 conservation_statuses = species['conservation_status'].unique()
@@ -84,10 +84,10 @@ print conservation_statuses
 # 
 # We'd like to count up how many species meet each of these criteria.  Use `groupby` to count how many `scientific_name` meet each of these criteria.
 
-# In[33]:
+# In[16]:
 
 
-species_conservation_status = species.groupby('conservation_status').scientific_name.count().reset_index()
+species_conservation_status = species.groupby('conservation_status').scientific_name.nunique().reset_index()
 print species_conservation_status
 
 
@@ -98,7 +98,7 @@ print species_conservation_status
 # species.fillna('No Intervention', inplace=True)
 # ```
 
-# In[34]:
+# In[17]:
 
 
 species.fillna('No Intervention', inplace=True)
@@ -106,10 +106,10 @@ species.fillna('No Intervention', inplace=True)
 
 # Great! Now run the same `groupby` as before to see how many species require `No Protection`.
 
-# In[35]:
+# In[18]:
 
 
-species_conservation_status = species.groupby('conservation_status').scientific_name.count().reset_index()
+species_conservation_status = species.groupby('conservation_status').scientific_name.nunique().reset_index()
 print species_conservation_status
 
 
@@ -122,7 +122,7 @@ print species_conservation_status
 #     .sort_values(by='scientific_name')
 # ```
 
-# In[37]:
+# In[19]:
 
 
 protection_counts = species.groupby('conservation_status')    .scientific_name.count().reset_index()    .sort_values(by='scientific_name')
@@ -139,7 +139,7 @@ print(protection_counts)
 # 6. Title the graph `Conservation Status by Species`
 # 7. Plot the grap using `plt.show()`
 
-# In[42]:
+# In[20]:
 
 
 plt.figure(figsize=(10,4))
@@ -150,6 +150,7 @@ ax.set_xticklabels(protection_counts['conservation_status'])
 plt.ylabel('Number of Species')
 plt.title('Conservation Status by Species')
 plt.show()
+plt.savefig('status-by-species.png')
 
 
 # # Step 4
@@ -157,7 +158,7 @@ plt.show()
 
 # Let's create a new column in `species` called `is_protected`, which is `True` if `conservation_status` is not equal to `No Intervention`, and `False` otherwise.
 
-# In[47]:
+# In[21]:
 
 
 species['is_protected'] = species.conservation_status.apply(lambda x: False if x == 'No Intervention' else True)
@@ -165,15 +166,15 @@ species['is_protected'] = species.conservation_status.apply(lambda x: False if x
 
 # Let's group by *both* `category` and `is_protected`.  Save your results to `category_counts`.
 
-# In[49]:
+# In[26]:
 
 
-category_counts = species.groupby(['category', 'is_protected'])    .scientific_name.count().reset_index()    .sort_values(by='scientific_name')
+category_counts = species.groupby(['category', 'is_protected'])    .scientific_name.count().reset_index()
 
 
 # Examine `category_count` using `head()`.
 
-# In[52]:
+# In[27]:
 
 
 print(category_counts.head())
@@ -186,7 +187,7 @@ print(category_counts.head())
 # 
 # Save your pivoted data to `category_pivot`. Remember to `reset_index()` at the end.
 
-# In[55]:
+# In[28]:
 
 
 category_pivot = category_counts.pivot(
@@ -197,7 +198,7 @@ category_pivot = category_counts.pivot(
 
 # Examine `category_pivot`.
 
-# In[56]:
+# In[29]:
 
 
 print category_pivot
@@ -289,7 +290,7 @@ print pval
 
 # Conservationists have been recording sightings of different species at several national parks for the past 7 days.  They've saved sent you their observations in a file called `observations.csv`.  Load `observations.csv` into a variable called `observations`, then use `head` to view the data.
 
-# In[71]:
+# In[34]:
 
 
 observations = pd.read_csv('observations.csv')
@@ -316,7 +317,7 @@ str2 = 'This string contains Cows'
 
 # Use `apply` and a `lambda` function to create a new column in `species` called `is_sheep` which is `True` if the `common_names` contains `'Sheep'`, and `False` otherwise.
 
-# In[74]:
+# In[35]:
 
 
 species['is_sheep'] = species.common_names.apply(lambda x: True if 'Sheep' in x else False)
@@ -324,7 +325,7 @@ species['is_sheep'] = species.common_names.apply(lambda x: True if 'Sheep' in x 
 
 # Select the rows of `species` where `is_sheep` is `True` and examine the results.
 
-# In[85]:
+# In[36]:
 
 
 sheep = species.loc[species['is_sheep'] == True]
@@ -333,7 +334,7 @@ print sheep
 
 # Many of the results are actually plants.  Select the rows of `species` where `is_sheep` is `True` and `category` is `Mammal`.  Save the results to the variable `sheep_species`.
 
-# In[79]:
+# In[37]:
 
 
 sheep_species = sheep.loc[sheep['category'] == 'Mammal']
@@ -341,7 +342,7 @@ sheep_species = sheep.loc[sheep['category'] == 'Mammal']
 
 # Now merge `sheep_species` with `observations` to get a DataFrame with observations of sheep.  Save this DataFrame as `sheep_observations`.
 
-# In[87]:
+# In[38]:
 
 
 sheep_observations = sheep_species.merge(observations)
@@ -351,7 +352,7 @@ sheep_observations = sheep_species.merge(observations)
 # 
 # This is the total number of sheep observed in each park over the past 7 days.
 
-# In[89]:
+# In[39]:
 
 
 obs_by_park = sheep_observations.groupby('park_name')    .observations.sum().reset_index()    .sort_values(by='observations')
@@ -368,7 +369,7 @@ obs_by_park = sheep_observations.groupby('park_name')    .observations.sum().res
 # 6. Title the graph `Observations of Sheep per Week`
 # 7. Plot the grap using `plt.show()`
 
-# In[90]:
+# In[40]:
 
 
 plt.figure(figsize=(16,4))
@@ -379,6 +380,7 @@ ax.set_xticklabels(obs_by_park['park_name'])
 plt.ylabel('Number of Observations')
 plt.title('Observations of Sheep per Week')
 plt.show()
+plt.savefig('sheep-observations.png')
 
 
 # Our scientists know that 15% of sheep at Bryce National Park have foot and mouth disease.  Park rangers at Yellowstone National Park have been running a program to reduce the rate of foot and mouth disease at that park.  The scientists want to test whether or not this program is working.  They want to be able to detect reductions of at least 5 percentage point.  For instance, if 10% of sheep in Yellowstone have foot and mouth disease, they'd like to be able to know this, with confidence.
@@ -387,16 +389,16 @@ plt.show()
 # 
 # Remember that "Minimum Detectable Effect" is a percent of the baseline.
 
-# In[99]:
+# In[41]:
 
 
-num_sheep = 35000
+num_sheep = 520
 print num_sheep
 
 
 # How many weeks would you need to observe sheep at Bryce National Park in order to observe enough sheep?  How many weeks would you need to observe at Yellowstone National Park to observe enough sheep?
 
-# In[103]:
+# In[42]:
 
 
 obs_per_week = int(obs_by_park.loc[obs_by_park['park_name'] == 'Bryce National Park'].observations)
@@ -404,7 +406,7 @@ weeks = num_sheep / obs_per_week
 print weeks
 
 
-# In[104]:
+# In[43]:
 
 
 obs_per_week = int(obs_by_park.loc[obs_by_park['park_name'] == 'Yellowstone National Park'].observations)
